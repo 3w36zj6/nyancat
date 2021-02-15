@@ -5,6 +5,7 @@ class Player:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.frame = 0
 
     def update(self):
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD_1_LEFT):
@@ -19,15 +20,17 @@ class Player:
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
             self.y = min(self.y + 2, pyxel.height - 24)
 
+        self.frame += 1
+
     def draw(self):
-        pyxel.blt(x=self.x, y=self.y, img=0, u=0, v=0, w=64, h=64, colkey=5)
+        pyxel.blt(x=self.x, y=self.y, img=0, u=0, v=24 *
+                  (self.frame // 3 % 6), w=40, h=24, colkey=5)
 
 
 class App:
     def __init__(self):
-        pyxel.init(width=160, height=120, caption="NyanCat")
+        pyxel.init(width=160, height=90, caption="NyanCat")
         pyxel.load(filename="assets/cat.pyxres")
-        pyxel.image(1).load(x=0, y=0, filename="assets/cat_16x16.png")
 
         # Player
         self.player = Player(x=50, y=50)
@@ -41,7 +44,7 @@ class App:
 
     def draw(self):
         pyxel.cls(0)
-        pyxel.blt(x=75, y=45, img=1, u=0, v=0, w=16, h=16, colkey=13)
+        pyxel.blt(x=75, y=45, img=1, u=0, v=0, w=40, h=24, colkey=5)
 
         self.player.draw()
 
