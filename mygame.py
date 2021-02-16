@@ -198,6 +198,44 @@ class Coin:
         for coin in Coin.coins:
             coin.__draw()
 
+class Bomb:
+    bombs = deque()
+    frame = 0
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.vx = 1.5 * random.random() + 0.8
+        self.frame = 0
+
+    def __update(self):
+        self.x -= self.vx
+        self.frame += 1
+
+    def __draw(self):
+        pyxel.blt(x=int(self.x), y=self.y, img=2,
+                  u=0, v=0, w=16, h=16, colkey=11)
+
+    @classmethod
+    def append_bomb(cls):
+        Bomb.bombs.append(Bomb(pyxel.width, random.randint(0, pyxel.height - 16)))
+
+    @classmethod
+    def update_all(self):
+        if Bomb.frame % 30 == 0:
+            Bomb.append_bomb()
+        for bomb in Bomb.bombs.copy():
+            bomb.__update()
+            if bomb.x < -16:
+                Bomb.bombs.remove(bomb)
+
+        Bomb.frame += 1
+
+    @classmethod
+    def draw_all(self):
+        for bomb in Bomb.bombs:
+            bomb.__draw()
+
 
 class App:
     def __init__(self):
@@ -213,6 +251,7 @@ class App:
         Star.update_all()
         Rainbow.update_all()
         Coin.update_all()
+        Bomb.update_all()
         Bullet.update_all()
         self.player.update()
 
@@ -225,6 +264,7 @@ class App:
         Star.draw_all()
         Rainbow.draw_all()
         Coin.draw_all()
+        Bomb.draw_all()
         Bullet.draw_all()
         self.player.draw()
 
