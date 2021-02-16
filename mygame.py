@@ -27,6 +27,9 @@ class Player:
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
             self.y = min(self.y + 2, pyxel.height - 24)
 
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            Bullet.append_bullet(self.x + 40 - 16, self.y + 24//2 - 16//2)
+
         Rainbow.append_rainbow(is_moving_right=is_moving_right,
                                x=self.x + 12, y=self.y + (self.animation_frame >= 3))
         self.animation_frame = self.frame // 3 % 6
@@ -120,6 +123,42 @@ class Star:
             star.draw()
 
 
+class Bullet:
+    bullets = deque()
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.frame = 0
+        self.animation_frame = 0
+
+    def update(self):
+        self.x += 4
+        self.animation_frame = self.frame // 2 % 4
+        self.frame += 1
+
+    def draw(self):
+        pyxel.blt(x=self.x, y=self.y, img=0,
+                  u=40, v=16*self.animation_frame, w=16, h=16, colkey=5)
+
+    @classmethod
+    def append_bullet(cls, x, y):
+        if len(Bullet.bullets) < 3:
+            Bullet.bullets.append(Bullet(x, y))
+
+    @classmethod
+    def update_all(self):
+        for bullet in Bullet.bullets.copy():
+            bullet.update()
+            if bullet.x > pyxel.width:
+                Bullet.bullets.popleft()
+
+    @classmethod
+    def draw_all(self):
+        for bullet in Bullet.bullets:
+            bullet.draw()
+
+
 class App:
     def __init__(self):
         pyxel.init(width=160, height=90, caption="NyanCat")
@@ -133,6 +172,7 @@ class App:
     def update(self):
         Star.update_all()
         Rainbow.update_all()
+        Bullet.update_all()
         self.player.update()
 
         if pyxel.btnp(pyxel.KEY_Q):
@@ -143,6 +183,7 @@ class App:
 
         Star.draw_all()
         Rainbow.draw_all()
+        Bullet.draw_all()
         self.player.draw()
 
 
