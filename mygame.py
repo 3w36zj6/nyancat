@@ -4,6 +4,9 @@ from collections import deque
 
 
 class Player:
+    width = 40
+    height = 24
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -19,18 +22,20 @@ class Player:
             Player.player.x = max(Player.player.x - 2, 0)
 
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD_1_RIGHT):
-            Player.player.x = min(Player.player.x + 2, pyxel.width - 40)
+            Player.player.x = min(Player.player.x + 2,
+                                  pyxel.width - Player.width)
             is_moving_right = True
 
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD_1_UP):
             Player.player.y = max(Player.player.y - 2, 0)
 
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
-            Player.player.y = min(Player.player.y + 2, pyxel.height - 24)
+            Player.player.y = min(Player.player.y + 2,
+                                  pyxel.height - Player.height)
 
         if pyxel.btnp(pyxel.KEY_SPACE):
-            Bullet.append_bullet(Player.player.x + 40 - 16,
-                                 Player.player.y + 24//2 - 16//2)
+            Bullet.append_bullet(Player.player.x + Player.width - 16,
+                                 Player.player.y + Player.height//2 - 16//2)
 
         Rainbow.append_rainbow(is_moving_right=is_moving_right,
                                x=Player.player.x + 12, y=Player.player.y + (Player.player.animation_frame >= 3))
@@ -39,8 +44,8 @@ class Player:
 
     @classmethod
     def draw(cls):
-        pyxel.blt(x=Player.player.x, y=Player.player.y, img=0, u=0, v=24 *
-                  Player.player.animation_frame, w=40, h=24, colkey=5)
+        pyxel.blt(x=Player.player.x, y=Player.player.y, img=0, u=0, v=Player.height *
+                  Player.player.animation_frame, w=Player.width, h=Player.height, colkey=5)
 
     @classmethod
     def setup(cls, x, y):
@@ -48,6 +53,9 @@ class Player:
 
 
 class Rainbow:
+    width = 1
+    height = 24
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -60,7 +68,7 @@ class Rainbow:
     def __draw(self):
         for i in range(3):
             pyxel.blt(x=self.x + i, y=self.y, img=1,
-                      u=0, v=0, w=16, h=24, colkey=1)
+                      u=0, v=0, w=Rainbow.width, h=Rainbow.height, colkey=1)
 
     @classmethod
     def setup(cls):
@@ -76,7 +84,7 @@ class Rainbow:
     def update_all(cls):
         for rainbow in Rainbow.rainbows.copy():
             rainbow.__update()
-            if rainbow.x < -16:
+            if rainbow.x < -Rainbow.width:
                 Rainbow.rainbows.popleft()
 
     @classmethod
@@ -89,6 +97,8 @@ class Star:
     stars = deque()
     frame = 0
     count = 0
+    width = 7
+    height = 7
 
     def __init__(self, x, y):
         self.x = x
@@ -103,16 +113,16 @@ class Star:
 
     def __draw(self):
         pyxel.blt(x=self.x, y=self.y, img=1,
-                  u=16, v=7*self.animation_frame, w=7, h=7, colkey=1)
+                  u=16, v=Star.height*self.animation_frame, w=Star.width, h=Star.height, colkey=1)
 
     @classmethod
     def append_star(cls):
         if Star.count % 2 == 0:
             Star.stars.append(
-                Star(x=pyxel.width, y=random.randint(0, (pyxel.height - 7) // 2)))
+                Star(x=pyxel.width, y=random.randint(0, (pyxel.height - Star.height) // 2)))
         else:
             Star.stars.append(
-                Star(x=pyxel.width, y=random.randint((pyxel.height - 7) // 2, pyxel.height - 7)))
+                Star(x=pyxel.width, y=random.randint((pyxel.height - Star.height) // 2, pyxel.height - Star.height)))
         Star.count += 1
 
     @classmethod
@@ -121,7 +131,7 @@ class Star:
             Star.append_star()
         for star in Star.stars.copy():
             star.__update()
-            if star.x < -16:
+            if star.x < -Star.width:
                 Star.stars.popleft()
 
         Star.frame += 1
@@ -133,6 +143,9 @@ class Star:
 
 
 class Bullet:
+    width = 16
+    height = 16
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -146,7 +159,7 @@ class Bullet:
 
     def __draw(self):
         pyxel.blt(x=self.x, y=self.y, img=0,
-                  u=40, v=16*self.animation_frame, w=16, h=16, colkey=5)
+                  u=40, v=Bullet.height*self.animation_frame, w=Bullet.width, h=Bullet.height, colkey=5)
 
     @classmethod
     def setup(cls):
@@ -171,6 +184,9 @@ class Bullet:
 
 
 class Coin:
+    width = 8
+    height = 9
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -185,7 +201,7 @@ class Coin:
 
     def __draw(self):
         pyxel.blt(x=int(self.x), y=self.y, img=1,
-                  u=24, v=9*self.animation_frame, w=8, h=9, colkey=1)
+                  u=24, v=Coin.height*self.animation_frame, w=Coin.width, h=Coin.height, colkey=1)
 
     @classmethod
     def setup(cls):
@@ -195,7 +211,7 @@ class Coin:
     @classmethod
     def append_coin(cls):
         Coin.coins.append(
-            Coin(pyxel.width, random.randint(0, pyxel.height - 9)))
+            Coin(pyxel.width, random.randint(0, pyxel.height - Coin.height)))
 
     @classmethod
     def update_all(cls):
@@ -203,7 +219,7 @@ class Coin:
             Coin.append_coin()
         for coin in Coin.coins.copy():
             coin.__update()
-            if coin.x < -8:
+            if coin.x < -Coin.width:
                 Coin.coins.remove(coin)
 
         Coin.frame += 1
@@ -215,6 +231,9 @@ class Coin:
 
 
 class Bomb:
+    width = 16
+    height = 16
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -227,7 +246,7 @@ class Bomb:
 
     def __draw(self):
         pyxel.blt(x=int(self.x), y=self.y, img=2,
-                  u=0, v=0, w=16, h=16, colkey=1)
+                  u=0, v=0, w=Bomb.width, h=Bomb.height, colkey=1)
 
     @classmethod
     def setup(cls):
@@ -237,7 +256,7 @@ class Bomb:
     @classmethod
     def append_bomb(cls):
         Bomb.bombs.append(
-            Bomb(pyxel.width, random.randint(0, pyxel.height - 16)))
+            Bomb(pyxel.width, random.randint(0, pyxel.height - Bomb.height)))
 
     @classmethod
     def update_all(cls):
@@ -245,9 +264,9 @@ class Bomb:
             Bomb.append_bomb()
         for bomb in Bomb.bombs.copy():
             bomb.__update()
-            if bomb.x < -16:
+            if bomb.x < -Bomb.width:
                 Bomb.bombs.remove(bomb)
-            if bomb.x < Player.player.x + 40 and Player.player.x < bomb.x + 16 and bomb.y < Player.player.y + 24 and Player.player.y < bomb.y + 16:
+            if bomb.x < Player.player.x + Player.width and Player.player.x < bomb.x + Bomb.width and bomb.y < Player.player.y + Player.height and Player.player.y < bomb.y + Bomb.height:
                 App.game_mode = 2
 
         Bomb.frame += 1
