@@ -224,7 +224,8 @@ class Coin:
                 continue
 
             if coin.x < Player.player.x + Player.width and Player.player.x < coin.x + Coin.width and coin.y < Player.player.y + Player.height and Player.player.y < coin.y + Coin.height:
-                App.score += 1
+                if App.game_mode == 1:
+                    App.score += 1
                 Coin.coins.remove(coin)
                 continue
 
@@ -304,6 +305,8 @@ class Bomb:
 
 
 class App:
+    score = 0
+    high_score = 0
     def __init__(self):
         pyxel.init(width=160, height=90, caption="NyanCat")
         pyxel.load(filename="assets/cat.pyxres")
@@ -314,6 +317,7 @@ class App:
 
     def setup(self):
         App.game_mode = 0
+        App.high_score = max(App.score, App.high_score)
         App.score = 0
 
         # Player
@@ -328,7 +332,7 @@ class App:
     def update(self):
         Star.update_all()
         Rainbow.update_all()
-        if App.game_mode == 1:
+        if App.game_mode != 0:
             Coin.update_all()
             Bomb.update_all()
         Bullet.update_all()
@@ -339,13 +343,13 @@ class App:
             self.setup()
 
         # Start
-        if pyxel.btnp(pyxel.KEY_S):
+        if pyxel.btnp(pyxel.KEY_S) and App.game_mode == 0:
             App.game_mode = 1
             App.start_frame_count = pyxel.frame_count
 
         # End
-        if pyxel.btnp(pyxel.KEY_E):
-            App.game_mode = 2
+        #if pyxel.btnp(pyxel.KEY_E):
+        #    App.game_mode = 2
 
         # Quit
         if pyxel.btnp(pyxel.KEY_Q):
@@ -362,7 +366,14 @@ class App:
         Bullet.draw_all()
         Player.draw()
 
-        pyxel.text(0, 0, f"Game Mode:{App.game_mode}", 6)
-        pyxel.text(0, 8, f"Score:{App.score}", 6)
+        pyxel.text(0, 0, f"High Score:{App.high_score}", [9, 10, 7][pyxel.frame_count // 2 % 3])
+        pyxel.text(0, 7, f"Score:{App.score}", 13)
+
+        if App.game_mode == 0:
+            pyxel.text(0, pyxel.height - 6, "Press [S] key to start.", 13)
+        elif App.game_mode == 1:
+            pass
+        elif App.game_mode == 2:
+            pyxel.text(0, pyxel.height - 6, "Press [R] key to retry.", 13)
 
 App()
