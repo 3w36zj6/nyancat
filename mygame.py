@@ -158,6 +158,46 @@ class Bullet:
         for bullet in Bullet.bullets:
             bullet.__draw()
 
+class Coin:
+    coins = deque()
+    frame = 0
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.vx = 2.0 * random.random() + 0.8
+        self.frame = 0
+        self.animation_frame = 0
+
+    def __update(self):
+        self.x -= self.vx
+        self.animation_frame = self.frame // 3 % 4
+        self.frame += 1
+
+    def __draw(self):
+        pyxel.blt(x=int(self.x), y=self.y, img=1,
+                  u=24, v=9*self.animation_frame, w=8, h=9, colkey=1)
+
+    @classmethod
+    def append_coin(cls):
+        Coin.coins.append(Coin(pyxel.width, random.randint(0, pyxel.height - 9)))
+
+    @classmethod
+    def update_all(self):
+        if Coin.frame % 8 == 0:
+            Coin.append_coin()
+        for coin in Coin.coins.copy():
+            coin.__update()
+            if coin.x < -8:
+                Coin.coins.remove(coin)
+
+        Coin.frame += 1
+
+    @classmethod
+    def draw_all(self):
+        for coin in Coin.coins:
+            coin.__draw()
+
 
 class App:
     def __init__(self):
@@ -172,6 +212,7 @@ class App:
     def update(self):
         Star.update_all()
         Rainbow.update_all()
+        Coin.update_all()
         Bullet.update_all()
         self.player.update()
 
@@ -183,6 +224,7 @@ class App:
 
         Star.draw_all()
         Rainbow.draw_all()
+        Coin.draw_all()
         Bullet.draw_all()
         self.player.draw()
 
