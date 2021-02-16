@@ -231,6 +231,7 @@ class Coin:
             for bullet in Bullet.bullets:
                 if coin.x < bullet.x + Bullet.width and bullet.x < coin.x + Coin.width and coin.y < bullet.y + Bullet.height and bullet.y < coin.y + Coin.height:
                     Coin.coins.remove(coin)
+                    break
 
 
         Coin.frame += 1
@@ -248,7 +249,7 @@ class Bomb:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.vx = 1.5 * random.random() + 0.8
+        self.vx = (1.5 * random.random() + 0.8) * (1 + (pyxel.frame_count - App.start_frame_count) / 600)
         self.frame = 0
 
     def __update(self):
@@ -271,7 +272,7 @@ class Bomb:
 
     @classmethod
     def update_all(cls):
-        if Bomb.frame % 30 == 0:
+        if Bomb.frame % max(30 - (pyxel.frame_count - App.start_frame_count) // 600, 5) == 0:
             Bomb.append_bomb()
         for bomb in Bomb.bombs.copy():
             bomb.__update()
@@ -283,7 +284,7 @@ class Bomb:
                 if bomb.x < bullet.x + Bullet.width and bullet.x < bomb.x + Bomb.width and bomb.y < bullet.y + Bullet.height and bullet.y < bomb.y + Bomb.height:
                     Bomb.bombs.remove(bomb)
                     Bullet.bullets.remove(bullet)
-                    continue
+                    break
 
             player_center_x = Player.player.x + Player.width // 2
             player_center_y = Player.player.y + Player.height // 2
@@ -292,6 +293,7 @@ class Bomb:
             #if bomb.x < Player.player.x + Player.width and Player.player.x < bomb.x + Bomb.width and bomb.y < Player.player.y + Player.height and Player.player.y < bomb.y + Bomb.height:
             if (player_center_x - bomb_center_x)**2 + (player_center_y - bomb_center_y)**2 < 10**2:
                 App.game_mode = 2
+                Bomb.bombs.remove(bomb)
 
         Bomb.frame += 1
 
@@ -339,6 +341,7 @@ class App:
         # Start
         if pyxel.btnp(pyxel.KEY_S):
             App.game_mode = 1
+            App.start_frame_count = pyxel.frame_count
 
         # End
         if pyxel.btnp(pyxel.KEY_E):
