@@ -269,7 +269,13 @@ class Bomb:
             bomb.__update()
             if bomb.x < -Bomb.width:
                 Bomb.bombs.remove(bomb)
-            if bomb.x < Player.player.x + Player.width and Player.player.x < bomb.x + Bomb.width and bomb.y < Player.player.y + Player.height and Player.player.y < bomb.y + Bomb.height:
+
+            player_center_x = Player.player.x + Player.width // 2
+            player_center_y = Player.player.y + Player.height // 2
+            bomb_center_x = bomb.x + Bomb.width // 2
+            bomb_center_y = bomb.y + Bomb.height // 2
+            #if bomb.x < Player.player.x + Player.width and Player.player.x < bomb.x + Bomb.width and bomb.y < Player.player.y + Player.height and Player.player.y < bomb.y + Bomb.height:
+            if (player_center_x - bomb_center_x)**2 + (player_center_y - bomb_center_y)**2 < 10**2:
                 App.game_mode = 2
 
         Bomb.frame += 1
