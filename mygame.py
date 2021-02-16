@@ -41,8 +41,6 @@ class Player:
 
 
 class Rainbow:
-    rainbows = deque()
-
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -58,20 +56,24 @@ class Rainbow:
                       u=0, v=0, w=16, h=24, colkey=1)
 
     @classmethod
+    def setup(cls):
+        Rainbow.rainbows = deque()
+
+    @classmethod
     def append_rainbow(cls, is_moving_right, x, y):
         Rainbow.rainbows.append(Rainbow(x, y))
         if is_moving_right:
             Rainbow.rainbows.append(Rainbow(x-3, y))
 
     @classmethod
-    def update_all(self):
+    def update_all(cls):
         for rainbow in Rainbow.rainbows.copy():
             rainbow.__update()
             if rainbow.x < -16:
                 Rainbow.rainbows.popleft()
 
     @classmethod
-    def draw_all(self):
+    def draw_all(cls):
         for rainbow in Rainbow.rainbows:
             rainbow.__draw()
 
@@ -107,7 +109,7 @@ class Star:
         Star.count += 1
 
     @classmethod
-    def update_all(self):
+    def update_all(cls):
         if Star.frame % 3 == 0:
             Star.append_star()
         for star in Star.stars.copy():
@@ -118,14 +120,12 @@ class Star:
         Star.frame += 1
 
     @classmethod
-    def draw_all(self):
+    def draw_all(cls):
         for star in Star.stars:
             star.__draw()
 
 
 class Bullet:
-    bullets = deque()
-
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -142,26 +142,28 @@ class Bullet:
                   u=40, v=16*self.animation_frame, w=16, h=16, colkey=5)
 
     @classmethod
+    def setup(cls):
+        Bullet.bullets = deque()
+
+    @classmethod
     def append_bullet(cls, x, y):
         if len(Bullet.bullets) < 3:
             Bullet.bullets.append(Bullet(x, y))
 
     @classmethod
-    def update_all(self):
+    def update_all(cls):
         for bullet in Bullet.bullets.copy():
             bullet.__update()
             if bullet.x > pyxel.width:
                 Bullet.bullets.popleft()
 
     @classmethod
-    def draw_all(self):
+    def draw_all(cls):
         for bullet in Bullet.bullets:
             bullet.__draw()
 
-class Coin:
-    coins = deque()
-    frame = 0
 
+class Coin:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -179,11 +181,17 @@ class Coin:
                   u=24, v=9*self.animation_frame, w=8, h=9, colkey=1)
 
     @classmethod
-    def append_coin(cls):
-        Coin.coins.append(Coin(pyxel.width, random.randint(0, pyxel.height - 9)))
+    def setup(cls):
+        Coin.coins = deque()
+        Coin.frame = 0
 
     @classmethod
-    def update_all(self):
+    def append_coin(cls):
+        Coin.coins.append(
+            Coin(pyxel.width, random.randint(0, pyxel.height - 9)))
+
+    @classmethod
+    def update_all(cls):
         if Coin.frame % 8 == 0:
             Coin.append_coin()
         for coin in Coin.coins.copy():
@@ -194,14 +202,12 @@ class Coin:
         Coin.frame += 1
 
     @classmethod
-    def draw_all(self):
+    def draw_all(cls):
         for coin in Coin.coins:
             coin.__draw()
 
-class Bomb:
-    bombs = deque()
-    frame = 0
 
+class Bomb:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -217,11 +223,17 @@ class Bomb:
                   u=0, v=0, w=16, h=16, colkey=1)
 
     @classmethod
-    def append_bomb(cls):
-        Bomb.bombs.append(Bomb(pyxel.width, random.randint(0, pyxel.height - 16)))
+    def setup(cls):
+        Bomb.bombs = deque()
+        Bomb.frame = 0
 
     @classmethod
-    def update_all(self):
+    def append_bomb(cls):
+        Bomb.bombs.append(
+            Bomb(pyxel.width, random.randint(0, pyxel.height - 16)))
+
+    @classmethod
+    def update_all(cls):
         if Bomb.frame % 30 == 0:
             Bomb.append_bomb()
         for bomb in Bomb.bombs.copy():
@@ -232,7 +244,7 @@ class Bomb:
         Bomb.frame += 1
 
     @classmethod
-    def draw_all(self):
+    def draw_all(cls):
         for bomb in Bomb.bombs:
             bomb.__draw()
 
@@ -242,19 +254,44 @@ class App:
         pyxel.init(width=160, height=90, caption="NyanCat")
         pyxel.load(filename="assets/cat.pyxres")
 
+        self.setup()
+
+        pyxel.run(self.update, self.draw)
+
+    def setup(self):
+        self.game_mode = 0
+
         # Player
         self.player = Player(x=pyxel.width // 2 - 20, y=50)
 
-        pyxel.run(self.update, self.draw)
+        # Other
+        Rainbow.setup()
+        Coin.setup()
+        Bomb.setup()
+        Bullet.setup()
 
     def update(self):
         Star.update_all()
         Rainbow.update_all()
-        Coin.update_all()
-        Bomb.update_all()
+        if self.game_mode == 1:
+            Coin.update_all()
+            Bomb.update_all()
         Bullet.update_all()
         self.player.update()
 
+        # Reset
+        if pyxel.btnp(pyxel.KEY_R):
+            self.setup()
+
+        # Start
+        if pyxel.btnp(pyxel.KEY_S):
+            self.game_mode = 1
+
+        # End
+        if pyxel.btnp(pyxel.KEY_E):
+            self.game_mode = 2
+
+        # Quit
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
@@ -263,10 +300,13 @@ class App:
 
         Star.draw_all()
         Rainbow.draw_all()
-        Coin.draw_all()
-        Bomb.draw_all()
+        if self.game_mode == 1:
+            Coin.draw_all()
+            Bomb.draw_all()
         Bullet.draw_all()
         self.player.draw()
+
+        pyxel.text(0, 0, f"Game Mode:{self.game_mode}", 6)
 
 
 App()
