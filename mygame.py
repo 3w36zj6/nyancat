@@ -214,7 +214,7 @@ class Bomb:
 
     def __draw(self):
         pyxel.blt(x=int(self.x), y=self.y, img=2,
-                  u=0, v=0, w=16, h=16, colkey=11)
+                  u=0, v=0, w=16, h=16, colkey=1)
 
     @classmethod
     def append_bomb(cls):
