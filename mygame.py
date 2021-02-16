@@ -48,11 +48,11 @@ class Rainbow:
         self.y = y
         self.frame = 0
 
-    def update(self):
+    def __update(self):
         self.x -= 3
         self.frame += 1
 
-    def draw(self):
+    def __draw(self):
         for i in range(3):
             pyxel.blt(x=self.x + i, y=self.y, img=1,
                       u=0, v=0, w=16, h=24, colkey=1)
@@ -66,14 +66,14 @@ class Rainbow:
     @classmethod
     def update_all(self):
         for rainbow in Rainbow.rainbows.copy():
-            rainbow.update()
+            rainbow.__update()
             if rainbow.x < -16:
                 Rainbow.rainbows.popleft()
 
     @classmethod
     def draw_all(self):
         for rainbow in Rainbow.rainbows:
-            rainbow.draw()
+            rainbow.__draw()
 
 
 class Star:
@@ -87,12 +87,12 @@ class Star:
         self.frame = random.randint(0, 17)
         self.animation_frame = 0
 
-    def update(self):
+    def __update(self):
         self.x -= 3
         self.animation_frame = self.frame // 3 % 6
         self.frame += 1
 
-    def draw(self):
+    def __draw(self):
         pyxel.blt(x=self.x, y=self.y, img=1,
                   u=16, v=7*self.animation_frame, w=7, h=7, colkey=1)
 
@@ -111,7 +111,7 @@ class Star:
         if Star.frame % 3 == 0:
             Star.append_star()
         for star in Star.stars.copy():
-            star.update()
+            star.__update()
             if star.x < -16:
                 Star.stars.popleft()
 
@@ -120,7 +120,7 @@ class Star:
     @classmethod
     def draw_all(self):
         for star in Star.stars:
-            star.draw()
+            star.__draw()
 
 
 class Bullet:
@@ -132,12 +132,12 @@ class Bullet:
         self.frame = 0
         self.animation_frame = 0
 
-    def update(self):
+    def __update(self):
         self.x += 4
         self.animation_frame = self.frame // 2 % 4
         self.frame += 1
 
-    def draw(self):
+    def __draw(self):
         pyxel.blt(x=self.x, y=self.y, img=0,
                   u=40, v=16*self.animation_frame, w=16, h=16, colkey=5)
 
@@ -149,14 +149,14 @@ class Bullet:
     @classmethod
     def update_all(self):
         for bullet in Bullet.bullets.copy():
-            bullet.update()
+            bullet.__update()
             if bullet.x > pyxel.width:
                 Bullet.bullets.popleft()
 
     @classmethod
     def draw_all(self):
         for bullet in Bullet.bullets:
-            bullet.draw()
+            bullet.__draw()
 
 
 class App:
