@@ -221,6 +221,9 @@ class Coin:
             coin.__update()
             if coin.x < -Coin.width:
                 Coin.coins.remove(coin)
+            if coin.x < Player.player.x + Player.width and Player.player.x < coin.x + Coin.width and coin.y < Player.player.y + Player.height and Player.player.y < coin.y + Coin.height:
+                App.score += 1
+                Coin.coins.remove(coin)
 
         Coin.frame += 1
 
@@ -288,6 +291,7 @@ class App:
 
     def setup(self):
         App.game_mode = 0
+        App.score = 0
 
         # Player
         Player.setup(x=pyxel.width // 2 - 20, y=50)
@@ -335,6 +339,6 @@ class App:
         Player.draw()
 
         pyxel.text(0, 0, f"Game Mode:{App.game_mode}", 6)
-
+        pyxel.text(0, 8, f"Score:{App.score}", 6)
 
 App()
