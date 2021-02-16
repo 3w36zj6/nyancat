@@ -10,34 +10,41 @@ class Player:
         self.frame = 0
         self.animation_frame = 0
 
-    def update(self):
+    @classmethod
+    def update(cls):
         # Rainbow
         is_moving_right = False
 
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD_1_LEFT):
-            self.x = max(self.x - 2, 0)
+            Player.player.x = max(Player.player.x - 2, 0)
 
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD_1_RIGHT):
-            self.x = min(self.x + 2, pyxel.width - 40)
+            Player.player.x = min(Player.player.x + 2, pyxel.width - 40)
             is_moving_right = True
 
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD_1_UP):
-            self.y = max(self.y - 2, 0)
+            Player.player.y = max(Player.player.y - 2, 0)
 
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
-            self.y = min(self.y + 2, pyxel.height - 24)
+            Player.player.y = min(Player.player.y + 2, pyxel.height - 24)
 
         if pyxel.btnp(pyxel.KEY_SPACE):
-            Bullet.append_bullet(self.x + 40 - 16, self.y + 24//2 - 16//2)
+            Bullet.append_bullet(Player.player.x + 40 - 16,
+                                 Player.player.y + 24//2 - 16//2)
 
         Rainbow.append_rainbow(is_moving_right=is_moving_right,
-                               x=self.x + 12, y=self.y + (self.animation_frame >= 3))
-        self.animation_frame = self.frame // 3 % 6
-        self.frame += 1
+                               x=Player.player.x + 12, y=Player.player.y + (Player.player.animation_frame >= 3))
+        Player.player.animation_frame = Player.player.frame // 3 % 6
+        Player.player.frame += 1
 
-    def draw(self):
-        pyxel.blt(x=self.x, y=self.y, img=0, u=0, v=24 *
-                  self.animation_frame, w=40, h=24, colkey=5)
+    @classmethod
+    def draw(cls):
+        pyxel.blt(x=Player.player.x, y=Player.player.y, img=0, u=0, v=24 *
+                  Player.player.animation_frame, w=40, h=24, colkey=5)
+
+    @classmethod
+    def setup(cls, x, y):
+        Player.player = Player(x, y)
 
 
 class Rainbow:
@@ -240,6 +247,8 @@ class Bomb:
             bomb.__update()
             if bomb.x < -16:
                 Bomb.bombs.remove(bomb)
+            if bomb.x < Player.player.x + 40 and Player.player.x < bomb.x + 16 and bomb.y < Player.player.y + 24 and Player.player.y < bomb.y + 16:
+                App.game_mode = 2
 
         Bomb.frame += 1
 
@@ -259,10 +268,10 @@ class App:
         pyxel.run(self.update, self.draw)
 
     def setup(self):
-        self.game_mode = 0
+        App.game_mode = 0
 
         # Player
-        self.player = Player(x=pyxel.width // 2 - 20, y=50)
+        Player.setup(x=pyxel.width // 2 - 20, y=50)
 
         # Other
         Rainbow.setup()
@@ -273,11 +282,11 @@ class App:
     def update(self):
         Star.update_all()
         Rainbow.update_all()
-        if self.game_mode == 1:
+        if App.game_mode == 1:
             Coin.update_all()
             Bomb.update_all()
         Bullet.update_all()
-        self.player.update()
+        Player.update()
 
         # Reset
         if pyxel.btnp(pyxel.KEY_R):
@@ -285,11 +294,11 @@ class App:
 
         # Start
         if pyxel.btnp(pyxel.KEY_S):
-            self.game_mode = 1
+            App.game_mode = 1
 
         # End
         if pyxel.btnp(pyxel.KEY_E):
-            self.game_mode = 2
+            App.game_mode = 2
 
         # Quit
         if pyxel.btnp(pyxel.KEY_Q):
@@ -300,13 +309,13 @@ class App:
 
         Star.draw_all()
         Rainbow.draw_all()
-        if self.game_mode == 1:
+        if App.game_mode == 1:
             Coin.draw_all()
             Bomb.draw_all()
         Bullet.draw_all()
-        self.player.draw()
+        Player.draw()
 
-        pyxel.text(0, 0, f"Game Mode:{self.game_mode}", 6)
+        pyxel.text(0, 0, f"Game Mode:{App.game_mode}", 6)
 
 
 App()
