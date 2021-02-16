@@ -221,9 +221,17 @@ class Coin:
             coin.__update()
             if coin.x < -Coin.width:
                 Coin.coins.remove(coin)
+                continue
+
             if coin.x < Player.player.x + Player.width and Player.player.x < coin.x + Coin.width and coin.y < Player.player.y + Player.height and Player.player.y < coin.y + Coin.height:
                 App.score += 1
                 Coin.coins.remove(coin)
+                continue
+
+            for bullet in Bullet.bullets:
+                if coin.x < bullet.x + Bullet.width and bullet.x < coin.x + Coin.width and coin.y < bullet.y + Bullet.height and bullet.y < coin.y + Coin.height:
+                    Coin.coins.remove(coin)
+
 
         Coin.frame += 1
 
@@ -269,6 +277,13 @@ class Bomb:
             bomb.__update()
             if bomb.x < -Bomb.width:
                 Bomb.bombs.remove(bomb)
+                continue
+
+            for bullet in Bullet.bullets.copy():
+                if bomb.x < bullet.x + Bullet.width and bullet.x < bomb.x + Bomb.width and bomb.y < bullet.y + Bullet.height and bullet.y < bomb.y + Bomb.height:
+                    Bomb.bombs.remove(bomb)
+                    Bullet.bullets.remove(bullet)
+                    continue
 
             player_center_x = Player.player.x + Player.width // 2
             player_center_y = Player.player.y + Player.height // 2
