@@ -84,7 +84,7 @@ class Rainbow:
     def update_all(cls):
         for rainbow in Rainbow.rainbows.copy():
             rainbow.__update()
-            if rainbow.x < -Rainbow.width:
+            if rainbow.x < - 10:
                 Rainbow.rainbows.popleft()
 
     @classmethod
