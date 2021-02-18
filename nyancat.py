@@ -294,7 +294,8 @@ class Bomb:
             #if bomb.x < Player.player.x + Player.width and Player.player.x < bomb.x + Bomb.width and bomb.y < Player.player.y + Player.height and Player.player.y < bomb.y + Bomb.height:
             if (player_center_x - bomb_center_x)**2 + (player_center_y - bomb_center_y)**2 < 10**2:
                 App.game_mode = 2
-                Bomb.bombs.remove(bomb)
+                if bomb in Bomb.bombs:
+                    Bomb.bombs.remove(bomb)
 
         Bomb.frame += 1
 
