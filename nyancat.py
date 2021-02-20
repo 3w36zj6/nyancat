@@ -234,7 +234,6 @@ class Coin:
                     Coin.coins.remove(coin)
                     break
 
-
         Coin.frame += 1
 
     @classmethod
@@ -250,7 +249,8 @@ class Bomb:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.vx = (1.5 * random.random() + 0.8) * (1 + (pyxel.frame_count - App.start_frame_count) / 600)
+        self.vx = (1.5 * random.random() + 0.8) * \
+            (1 + (pyxel.frame_count - App.start_frame_count) / 600)
         self.frame = 0
 
     def __update(self):
@@ -285,6 +285,7 @@ class Bomb:
                 if bomb.x < bullet.x + Bullet.width and bullet.x < bomb.x + Bomb.width and bomb.y < bullet.y + Bullet.height and bullet.y < bomb.y + Bomb.height:
                     Bomb.bombs.remove(bomb)
                     Bullet.bullets.remove(bullet)
+                    Explosion.append_explosion(bomb.x, bomb.y)
                     break
 
             player_center_x = Player.player.x + Player.width // 2
@@ -296,6 +297,7 @@ class Bomb:
                 App.game_mode = 2
                 if bomb in Bomb.bombs:
                     Bomb.bombs.remove(bomb)
+                Explosion.append_explosion(bomb.x, bomb.y)
 
         Bomb.frame += 1
 
@@ -305,9 +307,47 @@ class Bomb:
             bomb.__draw()
 
 
+class Explosion:
+    explosions = deque()
+    count = 0
+    width = 16
+    height = 16
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.frame = 0
+        self.animation_frame = 0
+
+    def __update(self):
+        self.animation_frame = self.frame // 3
+        self.frame += 1
+
+    def __draw(self):
+        pyxel.blt(x=self.x, y=self.y, img=0,
+                  u=56, v=Explosion.height*self.animation_frame, w=Explosion.width, h=Explosion.height, colkey=5)
+
+    @classmethod
+    def append_explosion(cls, x, y):
+        Explosion.explosions.append(Explosion(x=x, y=y))
+
+    @ classmethod
+    def update_all(cls):
+        for explosion in Explosion.explosions.copy():
+            explosion.__update()
+            if explosion.animation_frame > 3:
+                Explosion.explosions.popleft()
+
+    @ classmethod
+    def draw_all(cls):
+        for explosion in Explosion.explosions:
+            explosion.__draw()
+
+
 class App:
     score = 0
     high_score = 0
+
     def __init__(self):
         pyxel.init(width=160, height=90, caption="NyanCat")
         pyxel.load(filename="assets/cat.pyxres")
@@ -337,6 +377,7 @@ class App:
             Coin.update_all()
             Bomb.update_all()
         Bullet.update_all()
+        Explosion.update_all()
         Player.update()
 
         # Reset
@@ -365,6 +406,7 @@ class App:
             Coin.draw_all()
             Bomb.draw_all()
         Bullet.draw_all()
+        Explosion.draw_all()
         Player.draw()
 
         pyxel.text(0, 0, f"High Score:{App.high_score}", [9, 10, 7][pyxel.frame_count // 2 % 3])
@@ -376,5 +418,6 @@ class App:
             pass
         elif App.game_mode == 2:
             pyxel.text(0, pyxel.height - 6, "Press [R] key to retry.", 13)
+
 
 App()
