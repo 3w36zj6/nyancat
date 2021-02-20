@@ -268,8 +268,9 @@ class Bomb:
 
     @classmethod
     def append_bomb(cls):
-        Bomb.bombs.append(
-            Bomb(pyxel.width, random.randint(0, pyxel.height - Bomb.height)))
+        if App.game_mode == 1:
+            Bomb.bombs.append(
+                Bomb(pyxel.width, random.randint(0, pyxel.height - Bomb.height)))
 
     @classmethod
     def update_all(cls):
