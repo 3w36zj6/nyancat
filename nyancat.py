@@ -379,10 +379,6 @@ class App:
            App.game_mode = 2
         """
 
-        # Quit
-        if pyxel.btnp(pyxel.KEY_Q):
-            pyxel.quit()
-
     def draw(self):
         pyxel.cls(1)
 
