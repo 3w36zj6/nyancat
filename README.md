@@ -7,3 +7,17 @@ The original Nyan Cat animation was made by [PRguitarman](https://twitter.com/pr
 ```bash
 pip install pyxel==1.4.3
 ```
+
+## How to Play
+
+|Key|Description|
+|:-:|:-:|
+|UP|Move up.|
+|DOWN|Move down.|
+|LEFT|Move left.|
+|RIGHT|Move right.|
+|SPACE|Shoot a bullet.|
+|S|Start the game.|
+|R|Reset the game.|
+|ESC|Quit the game.|
+|Alt + Enter|Switch between full screen and window.|
