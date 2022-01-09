@@ -18,18 +18,18 @@ class Player:
         # Rainbow
         is_moving_right = False
 
-        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD_1_LEFT):
+        if pyxel.btn(pyxel.KEY_LEFT):
             cls.player.x = max(cls.player.x - 2, 0)
 
-        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD_1_RIGHT):
+        if pyxel.btn(pyxel.KEY_RIGHT):
             cls.player.x = min(cls.player.x + 2,
                                pyxel.width - cls.width)
             is_moving_right = True
 
-        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD_1_UP):
+        if pyxel.btn(pyxel.KEY_UP):
             cls.player.y = max(cls.player.y - 2, 0)
 
-        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
+        if pyxel.btn(pyxel.KEY_DOWN):
             cls.player.y = min(cls.player.y + 2,
                                pyxel.height - cls.height)
 
